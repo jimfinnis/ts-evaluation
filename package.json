@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@annotorious/react": "^3.3.3",
     "@types/openseadragon": "^3.0.10",
     "openseadragon": "^5.0.1",
     "react": "^19.0.0",

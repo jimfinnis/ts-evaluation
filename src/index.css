@@ -66,3 +66,13 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+.button-active {
+  background-color: cornflowerblue;
+}
+
+.osd-container {
+  background-color: #888888;
+  height: 600px;
+  width: 600px
+}
