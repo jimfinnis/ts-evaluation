@@ -12,8 +12,10 @@
   "dependencies": {
     "@annotorious/react": "^3.3.3",
     "@types/openseadragon": "^3.0.10",
+    "bootstrap": "^5.3.3",
     "openseadragon": "^5.0.1",
     "react": "^19.0.0",
+    "react-bootstrap": "^2.10.9",
     "react-dom": "^19.0.0"
   },
   "devDependencies": {

@@ -8,6 +8,11 @@ import {
 import '@annotorious/react/annotorious-react.css';
 import {Options} from "openseadragon";
 import {useEffect, useState} from "react";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
+import Container from "react-bootstrap/Container";
+import {Button} from "react-bootstrap";
+
 
 // The function is (i.e. returns a) component. The component is just a div,
 // but when it's added to the DOM an "effect hook" runs that loads up OpenSeadragon
@@ -49,51 +54,71 @@ export const MapComponent = () => {
         // )
     }, [anno]);
 
+    // well, now that's an ugly syntax!
+    function ToolButton({text, new_tool, tool_now}: { text: string,
+        new_tool: 'rectangle' | 'polygon',
+        tool_now: 'rectangle' | 'polygon' | undefined }) {
+        return <Button
+            className={new_tool === tool_now ? 'm-1 btn-primary' : 'm-1 btn-light'}
+            onClick={() => {
+                setTool(new_tool);
+            }}>{text}</Button>
+    }
+
+
+    function FuncButton({text, func}: { text: string, func: () => void }) {
+        return <Button className="m-1 btn-secondary"
+            onClick={func}>{text}</Button>
+    }
+
+    function deleteSelected() {
+        // delete the current annotation
+        const selected = anno.getSelected()
+        if (selected) {
+            selected.forEach(id => anno.removeAnnotation(id))
+        }
+    }
+
 
     // and now we return the actual DOM elements that will be mounted.
     return (
-        <div>
-            <OpenSeadragonAnnotator
-                drawingEnabled={tool != undefined}
-
-                tool={tool || 'rectangle'}
-            >
-                <OpenSeadragonViewer className="osd-container" options={options}/>
-                <button onClick={() => {console.log(anno.getAnnotations())}}>
-                    Display annotations on console
-                </button>
-            </OpenSeadragonAnnotator>
-            <p>Click a button and then draw your annotation.</p>
-            <div className='drawmodes'>
-                <button
-                    className={tool === 'rectangle' ? 'button-active' : ''}
-                    onClick={() => {
-                    setTool('rectangle');
-                }}>Rectangle</button>
-                <button
-                    className={tool === 'polygon' ? 'button-active' : ''}
-                    onClick={() => {
-                    setTool('polygon');
-                }}>Polygon</button>
-            </div>
-
-            { /* These are other buttons not related to drawing modes*/ }
-
-            <div className='actions'>
-                <button
-                    onClick={() => {
-                        // save annotations
-                        const annots = anno.getAnnotations();
-                        localStorage.setItem('annotations', JSON.stringify(annots));
-                    }}>Save</button>
-                <button
-                    onClick={() => {
-                        // clear annotations with confirmation
-                        if (confirm('Are you sure you want to clear all annotations?')) {
-                            anno.clearAnnotations();
-                        }
-                    }}>Clear</button>
-            </div>
-        </div>
+        <Container>
+            <Row>
+                <Col>
+                    <p>Use the mouse wheel to zoom in and out. To create an annotation, click <b>Rectangle</b> or <b>Poly</b> and then click
+                        in the image to draw (don't drag!).</p>
+                    <p>Other buttons let you <b>Delete</b> selected annotations, <b>Clear</b> all annotations, or <b>Save</b> (to local storage, no DB yet!)</p>
+                </Col>
+            </Row>
+            <Row>
+                <Col md="auto">
+                    <OpenSeadragonAnnotator drawingEnabled={tool != undefined} tool={tool || 'rectangle'}>
+                        <OpenSeadragonViewer className="osd-container" options={options}/>
+                    </OpenSeadragonAnnotator>
+                </Col>
+                <Col xs lg="2">
+                    <Row>
+                        <ToolButton text="Rectangle" new_tool="rectangle" tool_now={tool}/>
+                        <ToolButton text="Polygon" new_tool="polygon" tool_now={tool}/>
+                    </Row>
+                    <Row className="mt-5">
+                        <FuncButton text="Delete selected" func={() => {
+                            deleteSelected();
+                        }}/>
+                        <FuncButton text="Clear all" func={() => {
+                            // clear annotations with confirmation
+                            if (confirm('Are you sure you want to clear all annotations?')) {
+                                anno.clearAnnotations();
+                            }
+                        }}/>
+                        <FuncButton text="Save" func={() => {
+                            // save annotations
+                            const annots = anno.getAnnotations();
+                            localStorage.setItem('annotations', JSON.stringify(annots));
+                        }}/>
+                    </Row>
+                </Col>
+            </Row>
+        </Container>
     );
 }

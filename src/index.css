@@ -30,6 +30,10 @@ body {
   min-height: 100vh;
 }
 
+p {
+  text-align: left;
+}
+
 h1 {
   font-size: 3.2em;
   line-height: 1.1;
@@ -73,6 +77,6 @@ button:focus-visible {
 
 .osd-container {
   background-color: #888888;
-  height: 600px;
-  width: 600px
+  height: 800px;
+  width: 800px
 }
