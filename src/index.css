@@ -80,3 +80,23 @@ button:focus-visible {
   height: 800px;
   width: 800px
 }
+
+.a9s-popup {
+  text-align: left;
+  background-color: #1a1a1a;
+  color: #ffffff;
+  border: solid 1px #ffffff;
+  max-width: 400px;
+}
+
+.a9s-popup .title {
+  padding: 5px;
+  background-color: #213547;
+  color: #ffffff;
+  font-weight: bold;
+}
+
+.a9s-popup .body {
+  padding: 5px;
+  text-wrap: wrap;
+}

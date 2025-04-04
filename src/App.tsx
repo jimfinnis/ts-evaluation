@@ -8,7 +8,7 @@ function App() {
   return (
     <Annotorious>
         <Container className='p-3'>
-            <h1>Test App</h1>
+            <h1>Test Annotator App</h1>
             <MapComponent/>
         </Container>
     </Annotorious>

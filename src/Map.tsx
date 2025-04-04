@@ -1,13 +1,15 @@
 import {
-    AnnotoriousOpenSeadragonAnnotator,
+    AnnotoriousOpenSeadragonAnnotator, createBody, ImageAnnotation, OpenSeadragonAnnotationPopup,
     OpenSeadragonAnnotator,
-    OpenSeadragonViewer,
+    OpenSeadragonViewer, PopupProps,
     useAnnotator
 } from '@annotorious/react';
 
+
+
 import '@annotorious/react/annotorious-react.css';
 import {Options} from "openseadragon";
-import {useEffect, useState} from "react";
+import {ReactNode, useEffect, useState} from "react";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Container from "react-bootstrap/Container";
@@ -29,7 +31,14 @@ export const MapComponent = () => {
         "id": "seadragon-viewer",
         prefixUrl: "//openseadragon.github.io/openseadragon/images/",
         zoomPerClick: 1,    // this will make sure we don't zoom in automatically on click
-        "tileSources": source
+
+        // ignore the errors. I've written it like this - an array of tile sources - so that we can
+        // later add more. You'd put x,y,width,height coords on each.
+        "tileSources": [
+            {
+                tileSource: source
+            },
+        ]
     }
 
     const anno = useAnnotator<AnnotoriousOpenSeadragonAnnotator>();
@@ -41,7 +50,15 @@ export const MapComponent = () => {
         if (!anno) {
             return;
         }
-        anno.on('createAnnotation', () => {setTool(undefined)})
+        anno.on('createAnnotation', (a: ImageAnnotation) => {
+            setTool(undefined)
+            // here we can add a "body" to the annotation. This is a block of data which can contain
+            // a custom payload.
+            const body = createBody(
+                "A test annotation body",
+                {value: "This is the 'value' of the annotation. Lots of data of different types (not just text) can go in here, and you'll see it when you click on the annotation."},);
+            a.bodies.push(body);
+        })
 
         // we can set the initial annotations here.
         const annots = localStorage.getItem('annotations');
@@ -79,6 +96,29 @@ export const MapComponent = () => {
         }
     }
 
+    function getAnnotationPopup(annotation: ImageAnnotation) : ReactNode {
+        // here we can get the annotation body and display it
+        if (annotation.bodies.length == 0){
+            return "(no body)";
+        }
+        const body = annotation.bodies[0];
+        const value = body.value as string;
+        const dateString = new Date(body.created as Date).toLocaleString();
+        const user = body.creator ? body.creator.id : "unknown user";
+
+        return <div>
+            <Container>
+                <Row className="title">
+                    {dateString}: {user}
+                </Row>
+                <Row className="body">
+                    {value}
+                </Row>
+            </Container>
+        </div>;
+
+    }
+
 
     // and now we return the actual DOM elements that will be mounted.
     return (
@@ -94,6 +134,9 @@ export const MapComponent = () => {
                 <Col md="auto">
                     <OpenSeadragonAnnotator drawingEnabled={tool != undefined} tool={tool || 'rectangle'}>
                         <OpenSeadragonViewer className="osd-container" options={options}/>
+                        <OpenSeadragonAnnotationPopup popup={(props: PopupProps) => (
+                                getAnnotationPopup(props.annotation)
+                        )}/>
                     </OpenSeadragonAnnotator>
                 </Col>
                 <Col xs lg="2">
